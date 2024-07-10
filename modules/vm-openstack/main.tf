@@ -1,7 +1,9 @@
 variable "config" {
   type = object({
+    region          = optional(string, null)
     type            = optional(string, "m1.medium")
     image           = optional(string, "Ubuntu 22.04")
+    network         = optional(string, "public")
     size            = optional(number, 50)
     security_groups = optional(list(string), [])
     ports           = optional(list(string), [])
@@ -14,17 +16,20 @@ variable "user_data" {
 }
 
 data "openstack_images_image_v2" "image" {
+  region      = var.config.region
   name        = var.config.image
   most_recent = true
 }
 
 resource "openstack_networking_secgroup_v2" "secgroup" {
-  count = length(var.config.ports) > 0 ? 1 : 0
-  name  = "ports ${join(", ", var.config.ports)}"
+  count  = length(var.config.ports) > 0 ? 1 : 0
+  name   = "ports ${join(", ", var.config.ports)}"
+  region = var.config.region
 }
 
 resource "openstack_networking_secgroup_rule_v2" "secgroup_rule_1" {
   for_each          = toset(var.config.ports)
+  region            = var.config.region
   direction         = "ingress"
   ethertype         = "IPv4"
   protocol          = try(split("/", each.value)[1], "tcp")
@@ -36,6 +41,7 @@ resource "openstack_networking_secgroup_rule_v2" "secgroup_rule_1" {
 
 resource "openstack_compute_instance_v2" "server" {
   name        = var.name
+  region      = var.config.region
   flavor_name = var.config.type
   image_id    = var.config.size > 0 ? null : data.openstack_images_image_v2.image.id
   security_groups = length(var.config.security_groups) == 0 && length(var.config.ports) == 0 ? ["default"] : concat(
@@ -44,7 +50,7 @@ resource "openstack_compute_instance_v2" "server" {
   key_pair  = "default"
 
   network {
-    name = "public"
+    name = var.config.network
   }
 
   dynamic "block_device" {
