@@ -43,6 +43,10 @@ resource "google_compute_instance" "server" {
   machine_type = var.config.type
   tags         = [local.firewall_name]
 
+  advanced_machine_features {
+    enable_nested_virtualization = true
+  }
+
   boot_disk {
     initialize_params {
       image = var.config.image
