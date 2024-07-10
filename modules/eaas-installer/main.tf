@@ -16,6 +16,9 @@ module "userscript" {
   env    = merge(var.env, { domain = var.domain })
 }
 
+output "ports" {
+  value = ["22", "80", "443", "3478", "3478/udp"]
+}
 output "domain" {
   value = var.domain
 }
