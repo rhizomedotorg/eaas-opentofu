@@ -11,9 +11,15 @@ module "installer" {
   env    = var.env
 }
 
+locals {
+  ports = ["22", "80", "443", "3478", "3478/udp"]
+}
+
 module "server" {
-  source    = "../vm"
-  config    = var.vm_config
+  source = "../vm"
+  config = merge(var.vm_config, {
+    ports = concat(try(var.vm_config.ports, []), local.ports)
+  })
   name      = var.domain
   user_data = module.installer.user_data
 }
