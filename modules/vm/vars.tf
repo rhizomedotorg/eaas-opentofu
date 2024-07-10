@@ -1,7 +1,3 @@
-variable "config" {
-  type = object({
-    provider = string
-  })
-}
+variable "config" {}
 variable "name" {}
 variable "user_data" {}
