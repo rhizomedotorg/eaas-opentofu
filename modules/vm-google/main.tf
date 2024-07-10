@@ -1,10 +1,11 @@
 variable "config" {
   type = object({
-    zone  = optional(string, null)
-    type  = optional(string, "n2-standard-2")
-    image = optional(string, "ubuntu-os-cloud/ubuntu-2204-lts")
-    size  = optional(number, 50)
-    ports = optional(list(string), [])
+    zone      = optional(string, null)
+    type      = optional(string, "n2-standard-2")
+    image     = optional(string, "ubuntu-os-cloud/ubuntu-2204-lts")
+    disk_type = optional(string, null)
+    size      = optional(number, 50)
+    ports     = optional(list(string), [])
 
   })
   default = {}
@@ -51,6 +52,7 @@ resource "google_compute_instance" "server" {
 
   boot_disk {
     initialize_params {
+      type  = var.config.disk_type
       image = var.config.image
       size  = var.config.size
     }
