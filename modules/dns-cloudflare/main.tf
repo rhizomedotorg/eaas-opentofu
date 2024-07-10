@@ -1,3 +1,6 @@
+variable "config" {
+  default = null
+}
 variable "domain" {}
 variable "ip" {}
 variable "type" {

@@ -1,0 +1,17 @@
+#!/bin/sh -eu
+
+cd -- "$(dirname -- "$(realpath -- "$0")")"
+mkdir -p providers
+cd providers
+ln -sf ../vars.tf .
+type="$(basename -- "$(realpath ..)")"
+for v in ../../"$type"-*; do
+  provider="$(basename -- "$v")"
+  provider="${provider#$type-}"
+  sed -E \
+    -e "s/$type/$provider/" \
+    -e 's#".\/providers"#"'"$v"'"#' \
+    -e '/count\s+=/s/true\s*\|\|\s*//' \
+    -e '/output\s+/s/"([^"]+)"/"\1-'"$provider"'"/' \
+    ../main.tf >"$provider.tf"
+done
