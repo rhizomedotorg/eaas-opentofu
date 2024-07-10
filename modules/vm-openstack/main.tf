@@ -7,6 +7,7 @@ variable "config" {
     size            = optional(number, 50)
     security_groups = optional(list(string), [])
     ports           = optional(list(string), [])
+    key_pair        = optional(string, null)
   })
   default = {}
 }
@@ -47,7 +48,7 @@ resource "openstack_compute_instance_v2" "server" {
   security_groups = length(var.config.security_groups) == 0 && length(var.config.ports) == 0 ? ["default"] : concat(
   try([openstack_networking_secgroup_v2.secgroup[0].name], []), var.config.security_groups)
   user_data = var.user_data
-  key_pair  = "default"
+  key_pair  = var.config.key_pair
 
   network {
     name = var.config.network
