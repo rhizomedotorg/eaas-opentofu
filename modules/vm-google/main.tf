@@ -1,5 +1,6 @@
 variable "config" {
   type = object({
+    zone  = optional(string, null)
     type  = optional(string, "n2-standard-2")
     image = optional(string, "ubuntu-os-cloud/ubuntu-2204-lts")
     size  = optional(number, 50)
@@ -40,6 +41,7 @@ resource "google_compute_firewall" "default" {
 
 resource "google_compute_instance" "server" {
   name         = replace(var.name, "/[^-a-z0-9]/", "-")
+  zone         = var.config.zone
   machine_type = var.config.type
   tags         = [local.firewall_name]
 
