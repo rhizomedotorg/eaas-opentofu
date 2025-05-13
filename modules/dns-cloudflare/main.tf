@@ -8,12 +8,15 @@ variable "type" {
 }
 
 data "cloudflare_zone" "zone" {
-  name = join(".", reverse(slice(reverse(split(".", var.domain)), 0, 2)))
+  filter = {
+    name = join(".", reverse(slice(reverse(split(".", var.domain)), 0, 2)))
+  }
 }
 
-resource "cloudflare_record" "www" {
-  zone_id = data.cloudflare_zone.zone.id
+resource "cloudflare_dns_record" "www" {
+  zone_id = data.cloudflare_zone.zone.zone_id
   name    = var.domain
   type    = var.type
-  value   = var.ip
+  content = var.ip
+  ttl     = 1
 }
