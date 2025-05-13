@@ -1,0 +1,23 @@
+module "test-instance" {
+  source = "git::https://github.com/rhizomedotorg/eaas-opentofu//modules/eaas"
+  vm_config = {
+    provider = "google"
+    region   = "europe-west4"
+    zone     = "europe-west4-b"
+    type     = "n4-standard-2"
+  }
+  dns_config = {
+    provider = "cloudflare"
+  }
+  env = {
+    https                    = "1"
+    acmesh                   = "zerossl"
+    setup_keycloak           = "1"
+    import_test_environments = "1"
+    show_summary             = "1"
+    ssh_keys                 = <<-EOF
+      ssh-ed25519 ...
+    EOF
+  }
+  domain = "test.eaas.example"
+}
